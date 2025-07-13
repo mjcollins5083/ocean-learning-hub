@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guardians of the Blue: Interactive Learning Hub</title>
+    <!-- Chosen Palette: Ocean Blues -->
+    <!-- Application Structure Plan: The SPA is structured thematically around the core "New Literacies" from the source report (Scientific, Critical, Health, Financial, etc.). This creates an intuitive, educational user flow. A sticky navigation bar allows for non-linear exploration. The narrative begins with foundational scientific knowledge, moves to the problems (critical/health impact), explains the stakes (financial), and concludes with an interactive "call to action" section. This structure directly supports the unit's goals by making the connection between each literacy and the corresponding data explicit and digestible for a 5th-grade audience. -->
+    <!-- Visualization & Content Choices: Report Info -> Goal -> Viz/Method -> Justification. Scientific (Ocean Facts) -> Inform -> Donut Chart & Big Number (Chart.js/HTML) -> Best for simple proportions/key stats. Critical (Pollution Sources) -> Compare -> Stacked Bar (Chart.js) -> Shows composition and comparison. Health (Plastic in Food Chain) -> Organize -> HTML/CSS Flow Diagram -> Simple visual process for kids. Financial (Ocean Economy) -> Compare -> Horizontal Bar Chart (Chart.js) -> Ideal for comparing categories with long labels. Digital/Visual (Call to action) -> Interact -> JS-powered interactive cards -> Encourages user engagement and exploration. LLM Integration: Ocean Fact Generator (Scientific) -> Inform -> Text Generation (Gemini API) -> Provides dynamic, engaging facts. Ask the Ocean Expert (General) -> Inform/Q&A -> Text Generation (Gemini API) -> Allows open-ended inquiry. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #EBF4F8; 
+            color: #0A2342; 
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+                max-height: 400px;
+            }
+        }
+        .section-background-wave {
+            position: relative;
+            overflow: hidden;
+        }
+        .section-background-wave::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://placehold.co/1200x300/00B4D8/EBF4F8?text=Subtle+Wave+Pattern');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.08; 
+            z-index: -1;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-[#0A2342] text-white p-4 sticky top-0 z-50 shadow-lg">
+        <nav class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-extrabold text-[#90E0EF]">Guardians of the Blue</h1>
+            <ul class="hidden md:flex space-x-6 font-semibold">
+                <li><a href="#scientific" class="hover:text-[#00B4D8] transition-colors">Science</a></li>
+                <li><a href="#critical" class="hover:text-[#00B4D8] transition-colors">Impacts</a></li>
+                <li><a href="#economic" class="hover:text-[#00B4D8] transition-colors">Economy</a></li>
+                <li><a href="#action" class="hover:text-[#00B4D8] transition-colors">Take Action</a></li>
+                <li><a href="#expert" class="hover:text-[#00B4D8] transition-colors">Ask Expert</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="relative text-white text-center py-24 px-4 bg-cover bg-center" style="background-image: linear-gradient(rgba(10, 35, 66, 0.7), rgba(10, 35, 66, 0.7)), url('https://placehold.co/1200x600/0077B6/90E0EF?text=Happy+Dolphins+Leaping+in+Ocean');">
+        <h2 class="text-4xl md:text-6xl font-extrabold tracking-tight">Become a Guardian of the Blue</h2>
+        <p class="mt-4 text-lg md:text-xl max-w-3xl mx-auto">Explore the science, understand the impact, and discover how you can protect our amazing oceans.</p>
+    </div>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="scientific" class="py-12 md:py-16 section-background-wave">
+            <h3 class="text-3xl font-bold text-center text-[#0077B6] mb-4">Scientific Literacy: Our Ocean Planet</h3>
+            <p class="max-w-3xl mx-auto text-center text-lg mb-12">To protect our oceans, we first need to understand their immense scale and vital role in supporting all life on Earth. These numbers show just how important our planet's blue heart is.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h4 class="font-bold text-xl text-center mb-4">Earth's Surface Coverage</h4>
+                    <div class="chart-container">
+                        <canvas id="oceanCoverageChart"></canvas>
+                    </div>
+                    <p class="text-center mt-4 text-sm">This chart reveals that oceans cover the vast majority of our planet's surface.</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6 text-center h-full flex flex-col justify-center">
+                    <h4 class="font-bold text-xl mb-4">The Breath of the Planet</h4>
+                    <p class="text-7xl font-extrabold text-[#00B4D8]">~50%</p>
+                    <p class="mt-4 text-lg">of the oxygen we breathe is produced by marine plants like phytoplankton. Every second breath comes from the sea!</p>
+                </div>
+            </div>
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="text-center">
+                    <img src="https://placehold.co/600x300/0077B6/90E0EF?text=World+Map+with+Oceans+Highlighted" alt="World Map with Oceans Highlighted" class="rounded-lg shadow-md mx-auto w-full object-cover">
+                    <p class="text-sm mt-4">The world's oceans are all connected, forming one vast body of water.</p>
+                </div>
+                <div class="text-center">
+                    <img src="https://placehold.co/600x300/00B4D8/EBF4F8?text=Kids+Learning+About+Marine+Life" alt="Kids Learning About Marine Life" class="rounded-lg shadow-md mx-auto w-full object-cover">
+                    <p class="text-sm mt-4">Learning about marine life helps us appreciate the ocean's amazing biodiversity.</p>
+                </div>
+            </div>
+
+            <div class="mt-12 bg-white rounded-lg shadow-md p-6 text-center">
+                <h4 class="font-bold text-xl mb-4">Discover an Ocean Fact! ✨</h4>
+                <button id="generateFactBtn" class="bg-[#0077B6] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#00B4D8] transition-colors focus:outline-none focus:ring-2 focus:ring-[#0077B6] focus:ring-opacity-50">
+                    Generate New Fact
+                </button>
+                <p id="oceanFactDisplay" class="mt-4 text-lg italic min-h-[50px] flex items-center justify-center">Click the button to learn something new about the ocean!</p>
+            </div>
+        </section>
+
+        <hr class="border-t-2 border-[#00B4D8]/50 my-8">
+
+        <section id="critical" class="py-12 md:py-16 section-background-wave">
+            <h3 class="text-3xl font-bold text-center text-[#0077B6] mb-4">Critical & Health Literacy: Human Impacts</h3>
+            <p class="max-w-3xl mx-auto text-center text-lg mb-12">Our actions have a direct impact on the health of marine ecosystems and, in turn, our own health. By looking critically at issues like pollution, we can understand the problem and find solutions.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center">
+                <div class="lg:col-span-3 bg-white rounded-lg shadow-md p-6">
+                    <h4 class="font-bold text-xl text-center mb-4">Top 5 Items Found in Ocean Cleanups</h4>
+                     <div class="chart-container h-96">
+                        <canvas id="pollutionSourceChart"></canvas>
+                    </div>
+                    <p class="text-center mt-4 text-sm">This data shows that most ocean trash comes from single-use items we use on land every day.</p>
+                </div>
+                <div class="lg:col-span-2 bg-white rounded-lg shadow-md p-6 h-full">
+                    <h4 class="font-bold text-xl text-center mb-4">The Journey of Microplastics</h4>
+                     <div class="space-y-4 text-center">
+                        <div class="p-3 bg-blue-100 rounded-lg">
+                            <p class="font-semibold text-lg">1. Plastic Waste</p>
+                            <p>Bottles, bags, and wrappers enter the ocean.</p>
+                        </div>
+                        <div class="text-4xl font-bold text-[#0077B6]">↓</div>
+                        <div class="p-3 bg-blue-200 rounded-lg">
+                             <p class="font-semibold text-lg">2. Breakdown</p>
+                            <p>Sun and waves break it into tiny microplastics.</p>
+                        </div>
+                        <div class="text-4xl font-bold text-[#0077B6]">↓</div>
+                        <div class="p-3 bg-blue-300 rounded-lg">
+                             <p class="font-semibold text-lg">3. Enters Food Chain</p>
+                            <p>Fish and shellfish mistake it for food.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-12 text-center">
+                <img src="https://placehold.co/800x200/00B4D8/EBF4F8?text=Kids+Doing+Beach+Cleanup" alt="Kids Doing Beach Cleanup" class="rounded-lg shadow-md mx-auto w-full max-w-3xl object-cover">
+                <p class="text-sm mt-4">Helping to clean up beaches and rivers prevents trash from reaching the ocean.</p>
+            </div>
+        </section>
+        
+        <hr class="border-t-2 border-[#00B4D8]/50 my-8">
+
+        <section id="economic" class="py-12 md:py-16 section-background-wave">
+            <h3 class="text-3xl font-bold text-center text-[#0077B6] mb-4">Financial Literacy: The Blue Economy</h3>
+            <p class="max-w-3xl mx-auto text-center text-lg mb-12">A healthy ocean is also a wealthy ocean. It supports jobs, communities, and industries around the world. Protecting the ocean is a smart economic investment in our future.</p>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h4 class="font-bold text-xl text-center mb-4">Estimated Annual Value of Ocean Industries</h4>
+                <div class="chart-container h-[400px]">
+                    <canvas id="economicImpactChart"></canvas>
+                </div>
+                <p class="text-center mt-4 text-sm">Tourism and fishing are massive global industries that depend directly on a clean and vibrant marine environment.</p>
+            </div>
+            <div class="mt-12 text-center">
+                <img src="https://placehold.co/800x200/0077B6/90E0EF?text=Family+Enjoying+Beach+Tourism" alt="Family Enjoying Beach Tourism" class="rounded-lg shadow-md mx-auto w-full max-w-3xl object-cover">
+                <p class="text-sm mt-4">Healthy oceans mean beautiful beaches and thriving tourism, supporting many jobs.</p>
+            </div>
+        </section>
+
+        <hr class="border-t-2 border-[#00B4D8]/50 my-8">
+
+        <section id="action" class="py-12 md:py-16">
+            <h3 class="text-3xl font-bold text-center text-[#0077B6] mb-4">Digital & Visual Literacy: Take Action!</h3>
+            <p class="max-w-3xl mx-auto text-center text-lg mb-12">Now it's your turn to be a Guardian. Use your digital and visual skills to learn and share. Click on a card below to explore how you can make a difference.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div class="action-card cursor-pointer p-4 bg-white rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 transition-all text-center border-4 border-transparent" data-action="plastic">
+                    <p class="text-4xl mb-2">♻️</p>
+                    <h5 class="font-bold text-lg">Reduce Plastic</h5>
+                </div>
+                <div class="action-card cursor-pointer p-4 bg-white rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 transition-all text-center border-4 border-transparent" data-action="seafood">
+                    <p class="text-4xl mb-2">🐟</p>
+                    <h5 class="font-bold text-lg">Choose Sustainable Seafood</h5>
+                </div>
+                <div class="action-card cursor-pointer p-4 bg-white rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 transition-all text-center border-4 border-transparent" data-action="cleanups">
+                    <p class="text-4xl mb-2">🧹</p>
+                    <h5 class="font-bold text-lg">Join a Cleanup</h5>
+                </div>
+                <div class="action-card cursor-pointer p-4 bg-white rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 transition-all text-center border-4 border-transparent" data-action="share">
+                    <p class="text-4xl mb-2">📣</p>
+                    <h5 class="font-bold text-lg">Share Your Knowledge</h5>
+                </div>
+            </div>
+            <div id="action-display" class="bg-white p-8 rounded-lg shadow-inner min-h-[200px] transition-all">
+                <h5 id="action-title" class="text-2xl font-bold text-[#0077B6] mb-2">Select an action above!</h5>
+                <p id="action-text" class="text-lg">Learn more about the simple but powerful ways you can help protect our oceans.</p>
+            </div>
+            <div class="mt-12 text-center">
+                <img src="https://placehold.co/800x200/00B4D8/EBF4F8?text=Kids+Learning+and+Protecting+Ocean" alt="Kids Learning and Protecting Ocean" class="rounded-lg shadow-md mx-auto w-full max-w-3xl object-cover">
+                <p class="text-sm mt-4">Every action, big or small, helps protect our precious oceans.</p>
+            </div>
+        </section>
+
+        <hr class="border-t-2 border-[#00B4D8]/50 my-8">
+
+        <section id="expert" class="py-12 md:py-16 bg-white rounded-lg shadow-lg p-6 md:p-8">
+            <h3 class="text-3xl font-bold text-center text-[#0077B6] mb-4">Ask the Ocean Expert! ✨</h3>
+            <p class="max-w-3xl mx-auto text-center text-lg mb-8">Have a question about the ocean? Type it below and our Ocean Expert will try to answer!</p>
+            <div class="flex flex-col md:flex-row gap-4 max-w-2xl mx-auto">
+                <input type="text" id="expertQuestionInput" placeholder="e.g., How do fish breathe underwater?" class="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B4D8]">
+                <button id="askExpertBtn" class="bg-[#0077B6] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#00B4D8] transition-colors focus:outline-none focus:ring-2 focus:ring-[#0077B6] focus:ring-opacity-50">
+                    Ask ✨
+                </button>
+            </div>
+            <div id="expertAnswerDisplay" class="mt-8 p-6 bg-[#EBF4F8] rounded-lg shadow-inner min-h-[100px] text-lg italic flex items-center justify-center text-center">
+                Your answer will appear here!
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-[#0A2342] text-center text-white py-8 mt-12">
+        <p class="font-bold">The future of the ocean is in our hands.</p>
+        <p class="text-sm mt-2 text-[#90E0EF]">Guardians of the Blue © 2025</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const oceanBluesPalette = {
+                bg: '#EBF4F8',
+                text: '#0A2342',
+                accent1: '#0077B6', // Ocean Blue
+                accent2: '#00B4D8', // Sky Blue
+                accent3: '#90E0EF', // Light Aqua
+            };
+            
+            Chart.defaults.font.family = 'Inter, sans-serif';
+            Chart.defaults.color = oceanBluesPalette.text;
+
+            function wrapLabel(str, maxWidth) {
+                if (typeof str !== 'string') return str;
+                if (str.length <= maxWidth) {
+                    return str;
+                }
+                const words = str.split(' ');
+                let lines = [];
+                let currentLine = words[0];
+
+                for (let i = 1; i < words.length; i++) {
+                    if ((currentLine + ' ' + words[i]).length > maxWidth) {
+                        lines.push(currentLine);
+                        currentLine = words[i];
+                    } else {
+                        currentLine += ' ' + words[i];
+                    }
+                }
+                lines.push(currentLine);
+                return lines;
+            }
+
+            const tooltipTitleCallback = {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                const item = tooltipItems[0];
+                                let label = item.chart.data.labels[item.dataIndex];
+                                if (Array.isArray(label)) {
+                                  return label.join(' ');
+                                }
+                                return label;
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            };
+
+            const ctxOceanCoverage = document.getElementById('oceanCoverageChart').getContext('2d');
+            if(ctxOceanCoverage) {
+                new Chart(ctxOceanCoverage, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Ocean', 'Land'],
+                        datasets: [{
+                            data: [71, 29],
+                            backgroundColor: [oceanBluesPalette.accent1, oceanBluesPalette.accent3],
+                            borderColor: oceanBluesPalette.bg,
+                            borderWidth: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: tooltipTitleCallback.plugins
+                    }
+                });
+            }
+
+            const ctxPollutionSource = document.getElementById('pollutionSourceChart').getContext('2d');
+            if(ctxPollutionSource) {
+                 new Chart(ctxPollutionSource, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Food Wrappers', 'Cigarette Butts', 'Plastic Bottles', 'Plastic Bottle Caps', 'Plastic Bags'],
+                        datasets: [{
+                            label: 'Millions of Items Collected',
+                            data: [3.7, 3.6, 1.9, 1.5, 1.2],
+                            backgroundColor: oceanBluesPalette.accent2,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            ...tooltipTitleCallback.plugins,
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Items (in Millions)' }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            const ctxEconomicImpact = document.getElementById('economicImpactChart').getContext('2d');
+            if(ctxEconomicImpact) {
+                const rawLabels = ['Coastal and Marine Tourism', 'Marine Fisheries', 'Shipping and Transport', 'Marine Biotechnology'];
+                const wrappedLabels = rawLabels.map(label => wrapLabel(label, 16));
+                
+                new Chart(ctxEconomicImpact, {
+                    type: 'bar',
+                    data: {
+                        labels: wrappedLabels,
+                        datasets: [{
+                            label: 'Annual Value (Billions USD)',
+                            data: [390, 270, 700, 4.8],
+                             backgroundColor: [
+                                oceanBluesPalette.accent1,
+                                oceanBluesPalette.accent2,
+                                oceanBluesPalette.text,
+                                oceanBluesPalette.accent3
+                            ]
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                             ...tooltipTitleCallback.plugins,
+                            legend: { display: false }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Estimated Annual Value (in Billions of USD)' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const actionData = {
+                plastic: {
+                    title: "♻️ Reduce, Reuse, Refuse Plastic",
+                    text: "Single-use plastics are a major source of ocean pollution. You can help by using a reusable water bottle and bags, saying no to plastic straws, and choosing products with less packaging. Every piece of plastic you refuse is one less piece that could end up in the sea."
+                },
+                seafood: {
+                    title: "🐟 Choose Sustainable Seafood",
+                    text: "Overfishing can damage ocean ecosystems. When your family buys seafood, use a guide like the Monterey Bay Aquarium Seafood Watch. It helps you choose fish that are caught or farmed in ways that are healthy for the ocean."
+                },
+                cleanups: {
+                    title: "🧹 Join or Organize a Cleanup",
+                    text: "Participating in a local beach, river, or park cleanup is a direct way to stop trash from reaching the ocean. You can find events online or even start your own with friends and family. Every piece of trash removed makes a difference."
+                },
+                share: {
+                    title: "📣 Share Your Knowledge",
+                    text: "One of the most powerful things you can do is talk to people! Create a poster, make a short video, or just tell a friend what you've learned about protecting the oceans. When more people know, more people can help."
+                }
+            };
+
+            const actionCards = document.querySelectorAll('.action-card');
+            const actionTitle = document.getElementById('action-title');
+            const actionText = document.getElementById('action-text');
+
+            actionCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const actionKey = card.dataset.action;
+                    const data = actionData[actionKey];
+
+                    actionCards.forEach(c => c.classList.remove('border-[' + oceanBluesPalette.accent1 + ']'));
+                    card.classList.add('border-[' + oceanBluesPalette.accent1 + ']');
+                    
+                    if (data && actionTitle && actionText) {
+                        actionTitle.textContent = data.title;
+                        actionText.textContent = data.text;
+                    }
+                });
+            });
+
+            const generateFactBtn = document.getElementById('generateFactBtn');
+            const oceanFactDisplay = document.getElementById('oceanFactDisplay');
+            const askExpertBtn = document.getElementById('askExpertBtn');
+            const expertQuestionInput = document.getElementById('expertQuestionInput');
+            const expertAnswerDisplay = document.getElementById('expertAnswerDisplay');
+
+            generateFactBtn.addEventListener('click', async () => {
+                oceanFactDisplay.textContent = 'Generating a fascinating fact...';
+                generateFactBtn.disabled = true;
+                const prompt = "Generate a fascinating and kid-friendly fact about the ocean.";
+                try {
+                    let chatHistory = [];
+                    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                    const payload = { contents: chatHistory };
+                    const apiKey = ""; 
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                    const response = await fetch(apiUrl, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            });
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        oceanFactDisplay.textContent = text;
+                    } else {
+                        oceanFactDisplay.textContent = 'Could not generate a fact. Please try again.';
+                    }
+                } catch (error) {
+                    oceanFactDisplay.textContent = 'Error generating fact. Please try again.';
+                } finally {
+                    generateFactBtn.disabled = false;
+                }
+            });
+
+            askExpertBtn.addEventListener('click', async () => {
+                const question = expertQuestionInput.value.trim();
+                if (!question) {
+                    expertAnswerDisplay.textContent = 'Please type your question first!';
+                    return;
+                }
+
+                expertAnswerDisplay.textContent = 'Thinking...';
+                askExpertBtn.disabled = true;
+                
+                const prompt = `Answer the following question about the ocean in a kid-friendly way: "${question}"`;
+                try {
+                    let chatHistory = [];
+                    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                    const payload = { contents: chatHistory };
+                    const apiKey = ""; 
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                    const response = await fetch(apiUrl, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            });
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        expertAnswerDisplay.textContent = text;
+                    } else {
+                        expertAnswerDisplay.textContent = 'Sorry, I could not find an answer. Please try rephrasing your question.';
+                    }
+                } catch (error) {
+                    expertAnswerDisplay.textContent = 'Error getting answer. Please try again.';
+                } finally {
+                    askExpertBtn.disabled = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
